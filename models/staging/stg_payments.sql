@@ -1,6 +1,13 @@
 {{ config(materialized='view') }}
 
-with raw as (
+select
+    payment_id,
+    order_id,
+    payment_method,
+    payment_status,
+    amount,
+    paid_at
+from (
     select
         payment_id::int as payment_id,
         order_id::int as order_id,
@@ -9,18 +16,5 @@ with raw as (
         amount::numeric(12,2) as amount,
         nullif(paid_at, '')::timestamp as paid_at
     from {{ ref('payments') }}
-),
-filtered as (
-    select *
-    from raw
-    where payment_status in ('paid', 'pending', 'refunded', 'declined')
-)
-
-select
-    payment_id,
-    order_id,
-    payment_method,
-    payment_status,
-    amount,
-    paid_at
-from filtered
+) raw
+where payment_status in ('paid', 'pending', 'refunded', 'declined')

@@ -1,7 +1,7 @@
 {{ config(
     materialized='table',
     dist='order_id',
-    sort=['order_ts']
+    sort=['order_date']
 ) }}
 
 with orders as (
@@ -42,7 +42,7 @@ payments as (
 select
     o.order_id,
     o.customer_id,
-    o.order_ts,
+    o.order_date,
     o.status as order_status,
     o.total_amount,
     coalesce(p.total_paid, 0) as total_paid,

@@ -1,0 +1,7 @@
+payment_id,order_id,payment_method,payment_status,amount,paid_at
+5001,1001,credit_card,paid,120.50,2024-06-01 09:05:00
+5002,1002,pix,refunded,89.90,2024-06-10 12:00:00
+5003,1003,credit_card,paid,240.00,2024-06-12 16:20:00
+5004,1004,boleto,declined,75.00,2024-06-15 15:00:00
+5005,1005,pix,paid,310.25,2024-06-18 20:00:00
+5006,1006,boleto,pending,55.75,

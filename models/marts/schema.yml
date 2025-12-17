@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: Customer dimension with lifecycle and LTV metrics.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      - name: email
+        tests:
+          - not_null
+
+  - name: fct_orders
+    description: Fact table for orders enriched with payment rollups.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['shipped', 'processing', 'cancelled']
+      - name: latest_payment_status
+        tests:
+          - accepted_values:
+              values: ['paid', 'pending', 'refunded', 'declined', null]
+      - name: is_fully_paid
+        tests:
+          - not_null

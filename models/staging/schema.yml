@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Cleaned customer seed data.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      - name: email
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_orders
+    description: Cleaned orders with normalized statuses.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['shipped', 'processing', 'cancelled']
+
+  - name: stg_payments
+    description: Cleaned payments with status filtering.
+    columns:
+      - name: payment_id
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_status
+        tests:
+          - accepted_values:
+              values: ['paid', 'pending', 'refunded', 'declined']

@@ -7,15 +7,36 @@
 with orders as (
     select * from {{ ref('stg_orders') }}
 ),
-payments as (
+payment_sums as (
     select
         order_id,
         sum(case when payment_status = 'paid' then amount else 0 end) as total_paid,
-        sum(case when payment_status = 'refunded' then amount else 0 end) as total_refunded,
-        max(paid_at) as last_paid_at,
-        max_by(payment_status, paid_at) as latest_payment_status
+        sum(case when payment_status = 'refunded' then amount else 0 end) as total_refunded
     from {{ ref('stg_payments') }}
     group by order_id
+),
+payment_latest as (
+    select
+        order_id,
+        payment_status as latest_payment_status,
+        paid_at as last_paid_at,
+        row_number() over (partition by order_id order by paid_at desc nulls last) as rn
+    from {{ ref('stg_payments') }}
+),
+payments as (
+    select
+        coalesce(s.order_id, l.order_id) as order_id,
+        s.total_paid,
+        s.total_refunded,
+        l.latest_payment_status,
+        l.last_paid_at
+    from payment_sums s
+    full outer join (
+        select order_id, latest_payment_status, last_paid_at
+        from payment_latest
+        where rn = 1
+    ) l
+    on s.order_id = l.order_id
 )
 
 select

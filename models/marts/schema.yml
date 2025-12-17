@@ -32,7 +32,8 @@ models:
       - name: latest_payment_status
         tests:
           - accepted_values:
-              values: ['paid', 'pending', 'refunded', 'declined', null]
+              values: ['paid', 'pending', 'refunded', 'declined']
+              where: "latest_payment_status is not null"
       - name: is_fully_paid
         tests:
           - not_null
